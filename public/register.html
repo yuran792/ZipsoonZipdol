@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" type="text/css" href="./css/mainStyle.css">
+        <link rel="stylesheet" type="text/css" href="./css/register.css">
+        <title>집순집돌</title>
+    </head>
+    <body>
+        <div id="register">
+            <div id="title"><p>아지트 초대권</p></div>
+            <div id="registerBox">
+                <div id="beforeReg">
+                    <img id="logo" src="./img/logo.png">
+                    <form method="post" action="/register"name="registerform">
+                        <div class="formBox"><p>이름&nbsp;</p><input type="text" maxlength="12" name="name"></div>
+                        <div class="formBox"><p>닉네임&nbsp;</p><input type="text" maxlength="12" name="nick"></div>
+                        <div class="formBox"><p>아이디&nbsp;</p><input type="text" maxlength="12" name="id"><button>중복 확인</button></div>
+                        <div class="formBox"><p>비밀번호&nbsp;</p><input type="password" maxlength="12" name="password"></div>
+                        <div class="formBox"><p>비밀번호 확인&nbsp;</p><input type="password" maxlength="12" name="passwordCheck"></div>
+                        <div class="formBox"><p>메일주소&nbsp;</p><input type="email" maxlength="12" name="email"></div>
+                        <div class="formBox"><input type="submit" name="register" value="회원가입" id="submitregister"></div>
+                    </form>
+                </div>
+                <div id="afterReg">
+                    <p><sapn id="forname"></sapn>님, 환영합니다!</p><p>(5초 뒤 메인 페이지로 이동합니다)</p>
+                </div>
+                <img id="stamp" src="./img/logo.png">
+            </div>
+        </div>
+        <script>
+            var click=document.getElementById('submitregister');
+            click.onclick=function(){
+                var nick=document.registerform.nick;
+                document.getElementByIdElement('forname').innerHTML=name;
+                
+                document.getElementById('afterReg').style.visibility=visible;
+                document.getElementById('stamp').style.visibility=visible;
+            }
+
+        </script>
+    </body>
+</html>
