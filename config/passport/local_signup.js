@@ -11,22 +11,31 @@ module.exports= new LocalStrategy({
     
     //findByEmail이 blocking 되므로 async로 변경
     process.nextTick(function(){
-        var database=req.app.get('database');
+        var database=global.database;
         database.UserModel.findByEmail(email,function(err,user){
             if(err){
                 return done(err); //done 함수는 인증결과를 알려줌
             }
             if(user.length!=0){
                 console.log('기존에 계정이 있음');
-                return done(null,false,req.flash('signupMessage','계정이 이미 있습니다'));
+                return done(null,false,req.flash('signupMessage','이메일이 이미 등록되어 있습니다'));
             }
             else{
-                var user=new database.UserModel({email:email,password:password,name:paramName});
+                var user=new database.UserModel({email:email,password:password,name:paramName,userlist:['hyur0920@gmail.com']});
                 
                 user.save(function(err){
                     if(err){throw err;}
                     console.log('사용자 데이터 추가함');
-                    setTimeout(function(){return done(null,user);},5000);
+                    setTimeout(function(){return done(null,user);},6000);
+                });
+                
+                var chat=database.UserMessageModel.findByChatid('kim@naver.com','hyur0920@gmail.com',function(err,results){
+                    results[0].addMessage({sender:'kim@naver.com',receiver:'hyur0920@gmail.com',date:Date.now(),content:'지금 가는중~'},function(err){
+                        if(err) throw err;
+                        console.log('메세지 데이터 추가함');
+                        return done(null,user);
+                    })
+
                 });
             }
         });

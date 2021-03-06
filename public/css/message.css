@@ -1,0 +1,59 @@
+/* 대화 상대 리스트 출력박스*/
+#userlist{
+    width:20%;
+    height:100%;
+    background-color: forestgreen;
+}
+
+.user{
+    width:100%;
+    height:20%;
+    background-color: antiquewhite;
+}
+.user:hover{
+    cursor:grab;
+}
+
+/* 현재 대화상대와 대화내용 보여주는 박스*/
+#current{
+    width:80%;
+    height:100%;
+}
+
+/* 현재 대화 상대 프로필 */
+#currentPartner{
+    width:100%;
+    height:20%;
+    background-color: antiquewhite;
+}
+
+/* 현재 대화 내용 박스 */
+#currentConversation{
+    width:100%;
+    height:80%;
+    background-color: firebrick;
+}
+
+#messageBox{
+    width:100%;
+    height:85%;
+    background-color: burlywood;
+    overflow: scroll;
+}
+#sendBox{
+    width:100%;
+    height:15%;
+    background-color: cornflowerblue;
+}
+input#dataBox{
+    width:70%;
+    height:70%;
+}
+input#sendButton{
+    width:20%;
+    height:70%;
+}
+
+.self{
+    text-align: end;
+}

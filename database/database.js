@@ -52,7 +52,7 @@ function createSchema(app,config){
         //User모델 정의
         var curModel=mongoose.model(curItem.collection,curSchema);
         console.log('%s 컬렉션을 위해 모델 정의함.',curItem.collection);
-        
+
         //database객체에 속성으로 추가
         database[curItem.schemaName]=curSchema;
         database[curItem.modelName]=curModel;
@@ -60,6 +60,7 @@ function createSchema(app,config){
     }
     
     app.set('database',database); //req.app.get('database')로 데이터베이스 객체 참조 가능
+    global.database=app.get('database');
     console.log('database 객체가 app 객체의 속성으로 추가됨.');
 }
 

@@ -57,9 +57,12 @@
                 }
                 var name=form["name"].value;
                 document.getElementById("forname").innerHTML=name;
-                document.getElementById("afterReg").style.visibility="visible";
+                setTimeout(function(){
+                    document.getElementById("afterReg").style.visibility="visible";
                 document.getElementById("stamp").style.visibility="visible";
                 return true;
+                },1000);
+                
             }
         </script>
     </body>

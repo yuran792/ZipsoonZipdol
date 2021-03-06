@@ -1,7 +1,7 @@
 /* 초대장 전체 박스*/
 #register{
     width:-webkit-calc(70% - 2px); /*border용 픽셀 빼놓기*/
-    height:95%;
+    height:90%;
     margin:auto;
     padding-top:5%;
 }
@@ -23,14 +23,14 @@
 /*입력창 +어서오세요 회원님 칸*/
 #registerBox{
     width:100%;
-    height:80%;
-    border:1px solid gray;
+    height:-webkit-calc(80% - 1px);
+    border:1px solid black;
     border-top:0px;
     position:relative;
 }
 #beforeReg{
     width:100%;
-    height:76%;
+    height:68%;
     padding-top:4%;
 }
 
@@ -38,7 +38,7 @@
 /*정보 입력 칸*/
 #logo{
     width:8%;
-    height:20%;
+    height:27%;
     display:block;
     margin:auto
 }
@@ -46,14 +46,14 @@
 form{
     display:block;
     width:40%;
-    height:75%;
+    height:70%;
     padding-top: 3%;
     margin:auto;
 }
 .formBox{
     width:100%;
     height:7%;
-    margin-bottom:3%;
+    margin-bottom:5%;
     position:relative;
 }
 .formBox p{
@@ -68,24 +68,18 @@ form{
     width:40%;
     left:30%;
 }
-.formBox button{
-    position:absolute;
-    display:block;
-    width:20%;
-    left:75%;
-}
-.formBox:nth-child(7){
+.formBox:nth-child(5){
     margin-top:5%;
 }
-.formBox:nth-child(7) input{
-    width:20%;
-    left:40%;
+.formBox:nth-child(5) input{
+    width:15%;
+    left:42.5%;
 } 
 
 
 #afterReg{
     width:100%;
-    height:-webkit-calc(20% - 1px);
+    height:-webkit-calc(28% - 1px);
     border-top:1px dashed black;
     visibility:hidden;
     display: flex;
@@ -108,8 +102,8 @@ form{
 #stamp{
     position:absolute;
     visibility:hidden;
-    right:7%;
-    bottom:10%;
+    right:10%;
+    bottom:15%;
     z-index:2;
     transform: rotate(30deg);
     

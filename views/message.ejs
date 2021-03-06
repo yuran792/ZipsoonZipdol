@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,height=device-height,initial-scale=1">
+        <link rel="stylesheet" type="text/css" href="../public/css/mainStyle.css">
+        <link rel="stylesheet" type="text/css" href="../public/css/message.css">
+        <script src="../public/js/jquery.min.js"></script>
+        <script src="../public/js/jquery.jsonrpc.js"></script>
+        <script src="../public/js/aes.js"></script>
+        <script src="../socket.io/socket.io.js"></script>
+
+        
+        <title>집순집돌 쪽지함</title>
+    </head>
+    <body>
+        <header>
+            <div class="headerBox"><a class="headerLink" href="/profile">내 페이지</a> | <a class="headerLink" href="/message">쪽지함</a> | <a class="headerLink" href="/logout">로그아웃</a></div>
+        </header>
+        <div class="container">
+            <div id="userlist">
+                <% if(user){ %>
+                    <div id="myinfo"><span id="myname"><%= user.name %></span><span id="myemail"><%= user.email %></span></div>
+                <% } %>
+                <button onclick="getUserlist();">조회하기</button>
+            </div>
+            <div id="current">
+                <div id="currentPartner">
+                    <a href="/profile"><img src="../public/img/logo.png"></a>
+                    <p id="currentUserName"></p>
+                    <p id="currentUserEmail"></p>
+                </div>
+                <div id="currentConversation">
+                    <ol id="messageBox">
+                            <p><%= user.name %>님! 상대방과의 대화를 시작해보세요!</p>
+                            <p>상대방의 페이지에 들어가 쪽지보내기를 누르면 대화를 시작할 수 있어요!</p>
+
+                    </ol>
+                    <div id="sendBox">
+                        <input type="text" id="dataBox" placeholder="메시지를 입력하세요">
+                        <input type="button" id="sendButton" value="보내기" onclick="send();" >
+                    </div>
+                </div>
+                <hr/>
+                
+            </div>
+        </div>
+            
+      
+        <script>
+            var myname;
+            var myemail;
+            var socket;
+
+            function dateFormat(date){
+                
+            }
+            $(document).ready(function(){ //쪽지함 들어오는 순간 소켓 연결
+                myname=document.getElementById('myname').innerText;
+                myemail=document.getElementById('myemail').innerText;
+                var login={id:myemail,name:myname};
+                connectToServer();
+                if(socket==undefined){
+                    alert('서버에 연결되어 있지 않습니다.');
+                    return;
+                }
+                socket.emit('login',login); //접속자 리스트에 추가
+               // getUserlistFromDB();
+               
+               $.jsonRPC.setup({
+                   endPoint:'http://localhost:3000/api',
+                   namespace:''
+               });
+                
+                getUserlist();
+                
+                
+            });
+
+            function connectToServer(){
+                var options={'forceNew':true};
+                var url="http://localhost:3000";
+                socket=io.connect(url,options);
+                
+                socket.on('connect',function(){
+                    console.log('웹 소켓 서버에 연결되었습니다. :'+url);
+
+                     
+                    
+                    socket.on('response',function(response){ //서버로부터 response라는 응답이 왔을 때
+                        console.log(JSON.stringify(response));
+                    });
+                    
+                    socket.on('message',function(message){ //상대방으로부터 message라는 응답이 왔을 때
+                        console.log(JSON.stringify(message));
+                        
+                        addToMessageBox('other',message);
+                    });
+                    
+                    
+                });
+                
+                socket.on('disconnect',function(){
+                    console.log('웹 소켓 연결이 종료되었습니다.');
+                });
+            }
+            
+            function send(){
+                var message=$('#dataBox').val();
+                console.log('send()');
+                
+                var receiver=$('#currentUserEmail').text();
+                
+                var msg={sender:myemail,receiver:receiver,type:'text',date:Date.now(),content:message};
+                if(socket==undefined){
+                    alert('서버에 연결되어 있지 않습니다.');
+                    return;
+                }
+                socket.emit('message',msg);
+                addToMessageBox('self',msg);
+                $('#dataBox').val()='';
+                
+                /*
+                //암호화 테스트
+                var secret="my secret";
+                var encrypted=''+CryptoJS.AES.encrypt(message,secret);
+                console.log(encrypted);
+                
+                //복호화 테스트
+                var decrypted=''+CryptoJS.AES.decrypt(encrypted,secret).toString(CryptoJS.enc.Utf8);
+                console.log(decrypted);
+                var method='echo_encrypted';
+ 
+                    
+                $.jsonRPC.request(method,{
+                    id:1001,
+                    params:[encrypted],
+                    success:function(data){
+                        println('정상 응답을 받았습니다');
+                        console.dir(data);
+                        
+                        var secret="my secret";
+                        var encrypted=data.result[0];
+                        var decrypted=''+CryptoJS.AES.decrypt(encrypted,secret).toString(CryptoJS.enc.Utf8);
+                        
+                        console.log(decrypted);
+                        println(decrypted);
+                    },
+                    error:function(data){
+                        println('오류 응답을 받았습니다');
+                        console.dir(data);
+                        println(data.error.message);
+                    }
+                });
+                println('['+method+'] method로 요청을 보냈습니다.');
+                */
+            };
+            function addToMessageBox(writer,msg){
+                var contents="<li class='"+writer+"'>"
+                            +" <div class='profileimg'>"
+                            +"      <img src='../public/img/logo.png'>"
+                            +" </div>"
+                            +" <div class='messages'>"
+                            +"      <p>"+msg.content+"</p>"
+                            +"      <time datetime='"+msg.date+"'>"+msg.date+"</time>"
+                            +" </div>"
+                            +"</li>";
+                console.log('추가할 HTML'+contents);
+                $('#messageBox').append(contents);
+            }
+            
+            function getUserlist(){
+                var method='usermessageList';
+                var id=1004;
+                var params=[{id:myemail,name:myname}];
+                
+                sendRequest(method,id,params);             
+            }
+            
+            function getMessage(){
+                $('#messageBox').empty();
+                var user=event.currentTarget.innerText;
+                user=user.split('\n\n');
+                console.dir(user);
+                var curusername=user[0];
+                var curuseremail=user[1];
+                var method="getmessage";
+                var id=1005;
+                var params=[{myemail:myemail,otheremail:curuseremail}];
+                
+                $('#currentUserName').text(curusername);
+                $('#currentUserEmail').text(curuseremail);
+                sendRequest(method,id,params);
+        
+            }
+            
+            function sendRequest(method,id,params){
+                $.jsonRPC.request(method,{
+                    id:id,
+                    params:params,
+                    success:function(data){
+                        console.dir(data);
+                        processResponse(data); //정상 응답 후 처리과정
+                    },
+                    error:function(data){
+                        console.dir(data);
+                        processError(data); //오류 응답 후 처리과정
+                    }
+                });
+            }
+            
+            function processResponse(data){
+                if(Array.isArray(data.result)){
+                    if(data.id==1004){ //대화상대 리스트 출력 요청 정상 응답 시
+                        data.result.forEach(function(item,index){
+                        var user='<div class="user" onclick="getMessage();">'+
+                        '<a href="/profile"><img></a>'+
+                            '<p class="userName">'+item.name+'</p>'
+                        +'<p class="userId">'+item.email+'</p>'
+                            +'</div>';
+                       
+                        $('#userlist').append(user);
+                        
+                    });
+                    }
+                    else if(data.id==1005){ //선택한 대화상대와의 대화 내용 정상 응답 시 
+                        data.result.forEach(function(item,index){
+                            if(item.sender==myemail){
+                                addToMessageBox('self',item);
+                            }
+                            else{
+                                addToMessageBox('other',item);
+                            }
+                        })
+                    }
+                    
+                }
+            }
+            
+            function processError(data){
+                
+            }
+            
+        </script>
+    </body>
+</html>

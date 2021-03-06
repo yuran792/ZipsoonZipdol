@@ -17,6 +17,7 @@ var expressSession=require('express-session');
 var multer=require('multer');
 var fs=require('fs');
 
+var socketio=require('socket.io')(); //객체가 아니고 클래스임
 //클라이언트에서 ajax 요청했을 때 cors(다중 서버 접속)지원
 var cors=require('cors');
 
@@ -89,6 +90,16 @@ configPassport(app,passport);
 var userPassport=require('./routes/user_passport'); //라우팅
 userPassport(app,passport);
 
+var handler_loader=require('./handlers/handler_loader');
+
+//JSON-RPC 사용
+var jayson=require('jayson');
+
+//JSON-RPC 핸들러 정보를 읽어 들여 핸들러 경로 설정
+var jsonrpc_api_path=config.jsonrpc_api_path||'/api';
+handler_loader.init(jayson,app,jsonrpc_api_path);
+
+console.log('JSON_RPC를 ['+jsonrpc_api_path+'] 패스에서 사용하도록 설정함');
 
 //404 오류 페이지 처리
 var errorHandler=expressErrorHandler({
@@ -100,8 +111,89 @@ app.use(expressErrorHandler.httpError(404));
 app.use(errorHandler);
 
 //서버 시작
-http.createServer(app).listen(app.get('port'),function(){
+var server=http.createServer(app).listen(app.get('port'),function(){
     console.log('익스프레스 서버를 시작했습니다 : '+app.get('port'));
     
     database.init(app,config); //데이터베이스 생성
 })
+
+
+//socket.io 서버를 시작합니다
+var io= socketio.listen(server); //io 객체 안에 socket 객체가 포함됨
+console.log('socket.io 요청을 받아들일 준비가 되엇습니다.');
+
+//클라이언트가 연결했을 때의 이벤트 처리
+io.sockets.on('connection',function(socket){    
+    console.log('connection info : ',socket.request.connection._peername);
+    
+    //소켓 객체에 클라이언트 host, port 정보 속성으로 추가
+    socket.remoteAddress=socket.request.connection._peername.address;
+    socket.remotePort=socket.request.connection._peername.port;
+    
+    
+    //로그인 아이디 매핑 --> 쪽지함에 들어와있는 사람들
+    var login_ids={};
+    
+    socket.on('login',function(login){ //쪽지함 접속 시
+        console.log('쪽지함 로그인 이벤트를 받았습니다');
+        console.log(login);
+        console.log('접속한 소켓의 id :'+socket.id);
+        login_ids[login.id]=socket.id;
+        socket.login_id=login.id;
+        console.log('접속한 클라이언트 ID의 개수 : %d',Object.keys(login_ids).length); //배열로 바꾼 후 개수 출력
+        console.dir(login_ids);
+        //데이터베이스 불러오기
+        
+        //var userlist=getUserlistFromDB(db,login.id);
+        //socket.emit('userlist',userlist);
+    });
+
+    
+    //message 이벤트를 받았을 때의 처리
+    socket.on('message',function(message){
+        console.log('message 이벤트를 받았습니다.');
+        console.dir(login_ids);
+        
+        //일대일 채팅 대상에게 메시지 전달
+        if(login_ids[message.receiver]){
+            if(io.sockets.connected[login_ids[message.receiver]]){ //접속 리스트에도 있고 연결되어있다면
+                io.sockets.connected[login_ids[message.receiver]].emit('message',message);
+            }
+            else{ //쪽지함을 떠난 것으로
+                 login_ids.delete(message.receiver); //리스트에서 삭제
+                //데이터베이스에 저장
+            }
+            
+            
+        }else{//현재 접속중이지 않음
+            console.log('상대방이 실시간에 있지 않습니다.');
+            var database=global.database;
+            if(database.db){
+                var chatid= database.UserMessageModel.findByChatid(message.sender,message.receiver,function(err,result){
+                    if(err) throw err;
+                    
+                    var newmessage={sender:message.sender,receiver:message.receiver,date:message.date,content:message.content};
+                    if(result.length!=0){ //대화내역이 있다면    
+                        result[0].addMessage(newmessage,function(err){
+                            if(err) throw err;
+                            console.log('메시지를 저장했습니다.');
+                        });
+                        
+                    }
+                    else{
+                        var chat=new database.UserMessageModel({
+                            chatId:message.sender+message.receiver,message:[newmessage]
+                        });
+                        chat.save(function(err){
+                            if(err) throw err;
+                            console.log('채팅방을 생성합니다.')
+                        })
+                        
+                    }
+                    
+                });
+            }
+        }
+    });
+    
+});

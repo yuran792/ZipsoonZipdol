@@ -4,6 +4,15 @@ module.exports=function(router,passport){
     //홈 화면=로그인 화면
     router.route('/').get(function(req,res){
         console.log('/ 패스 요청됨.');
+        if(req.user){
+            console.log("이미 로그인된 상태임");
+            if(Array.isArray(req.user)){
+                res.render('main.ejs',{user:req.user[0]});
+            }
+            else{
+                res.render('main.ejs',{user:req.user});
+            }
+        }
         res.render('entrance.ejs',{message:req.flash('loginMessage')});
     });
     
@@ -41,6 +50,7 @@ module.exports=function(router,passport){
         }
     });
     
+    //헤더 바로가기 3개 루트
     //내 프로필 화면
     router.route('/profile').get(function(req,res){
         console.log('/profile 패스 요청됨');
@@ -65,6 +75,27 @@ module.exports=function(router,passport){
         }
         
 
+    });
+    
+    //내 쪽지함 화면
+    router.route('/message').get(function(req,res){
+        console.log('/message 패스 요청됨');
+       
+        //인증이 안 된 경우
+        if(!req.user){
+            console.log('사용자 인증이 안 된 상태임');
+            res.redirect('/');
+            return;
+        }
+    
+        //인증된 경우
+        console.log('사용자 인증된 상태임.');
+        if(Array.isArray(req.user)){
+            res.render('message.ejs',{user:req.user[0]});
+        }
+        else{
+            res.render('message.ejs',{user:req.user});
+        }
     });
     
     //로그아웃
