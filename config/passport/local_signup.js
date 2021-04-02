@@ -29,6 +29,15 @@ module.exports= new LocalStrategy({
                     setTimeout(function(){return done(null,user);},6000);
                 });
                 
+                /*
+                var chat=new database.UserMessageModel({chatId:'hyur0920@gmail.comkim@naver.com',message:[{sender:'hyur0920@gmail.com',receiver:'kim@naver.com',date:Date.now(),content:'님 어디?'}]});
+                
+                chat.save(function(err){
+                    if(err) {throw err;}
+                    console.log('채팅방 만듦');
+                    done(null,null);
+                });*/
+                /*
                 var chat=database.UserMessageModel.findByChatid('kim@naver.com','hyur0920@gmail.com',function(err,results){
                     results[0].addMessage({sender:'kim@naver.com',receiver:'hyur0920@gmail.com',date:Date.now(),content:'지금 가는중~'},function(err){
                         if(err) throw err;
@@ -36,7 +45,7 @@ module.exports= new LocalStrategy({
                         return done(null,user);
                     })
 
-                });
+                }); */
             }
         });
     });

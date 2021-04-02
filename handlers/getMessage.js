@@ -21,7 +21,6 @@ var getMessage=function(params,callback){
             //대화 내용이 있었다면
             if(results){
                 console.log('결과물 문서 데이터의 개수 :%d',results.length);
-                
                 var output=[];
                 for(var i=0;i<results.length;i++){
                     var cur=results[i]._doc.message;

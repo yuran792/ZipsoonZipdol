@@ -1,17 +1,53 @@
 /* 대화 상대 리스트 출력박스*/
 #userlist{
-    width:20%;
-    height:100%;
-    background-color: forestgreen;
+    width:-webkit-calc(20% - 1px);
+    height:-webkit-calc(100% - 2px - 30px);
+    border:1px solid black;
+    border-right: 0px;
+    border-radius:10px 0px 0px 10px;
+    padding-top:30px;
 }
-
+#myinfo{
+    display: none;
+}
 .user{
-    width:100%;
-    height:20%;
-    background-color: antiquewhite;
+    margin:5px;
+    position:relative;
+    width:-webkit-calc(100% - 10px);
+    height:120px;
+    border-bottom: 1px solid black;
 }
 .user:hover{
-    cursor:grab;
+    cursor:pointer;
+}
+.user a{
+    position:absolute;
+    top:19px;
+    width:80px;
+    height:80px;
+    display: inline-block;
+    border:1px solid black;
+    border-radius:40px;
+}
+.user img{
+    width:100%;
+    height:100%;
+    object-fit: none;
+
+}
+.user p{
+    position:absolute;
+    left:90px;
+    height:30px;
+    display:inline-block;
+}
+.user .userName{
+    bottom:60px;
+    font-size:1.3em;
+}
+.user .userId{
+    bottom:25px;
+    font-size:0.8em;
 }
 
 /* 현재 대화상대와 대화내용 보여주는 박스*/
@@ -22,38 +58,157 @@
 
 /* 현재 대화 상대 프로필 */
 #currentPartner{
-    width:100%;
-    height:20%;
-    background-color: antiquewhite;
+    padding:10px;
+    position: relative;
+    width:-webkit-calc(100% - 20px - 2px);
+    height:-webkit-calc(120px - 2px);
+    border:1px solid #FF4B6A;
+    border-radius: 0px 10px 0px 0px;
+    background-color: #FF4B6A;
 }
+#currentPartner a{
+    display:inline-block;
+    position: absolute;
+    top:18px; /* padding 포함 */
+
+    width:100px;
+    height:100px;
+    border:1px solid black;
+    border-radius:50px;
+    background-color: white;
+}
+#currentPartner img{
+    object-fit: none;
+    width:100%;
+    height:100%;
+    
+}
+#currentPartner p{
+    position:absolute;
+    left:140px;
+    height:40px;
+    display:inline-block;
+
+}
+
+#currentPartner #currentUserName{
+    bottom:69px;
+    font-size:1.5em;
+    
+}
+#currentPartner #currentUserEmail{
+    bottom:29px;
+    font-size:1.2em;
+}
+
 
 /* 현재 대화 내용 박스 */
 #currentConversation{
     width:100%;
     height:80%;
-    background-color: firebrick;
 }
 
 #messageBox{
+    padding-bottom: 0px;
     width:100%;
     height:85%;
-    background-color: burlywood;
-    overflow: scroll;
+    background-color: #FCFCFC;
+    overflow: auto;
+
 }
+#messageBox::-webkit-scrollbar{
+    width:10px;
+    
+}
+#messageBox::-webkit-scrollbar-thumb{
+    background-color: #FF4B6A;
+}
+
+#messageInfo{
+    width:100%;
+    height:100%;
+    display: flex;
+    flex-direction:column;
+    justify-content: center;
+    align-content: center;
+}
+#messageInfo p{
+    text-align: center;
+}
+ /* 보내기 버튼이 있는 칸 */
 #sendBox{
     width:100%;
     height:15%;
-    background-color: cornflowerblue;
+    position:relative;
 }
 input#dataBox{
-    width:70%;
-    height:70%;
+    position: absolute;
+    left:5%;
+    top:15%;
+        
+    width:73%;
+    height:50%;
+    border-radius: 30px;
+}
+input#dataBox:focus{
+    outline: none;
 }
 input#sendButton{
-    width:20%;
-    height:70%;
+    position: absolute;
+    left:80%;
+    top:15%;
+    
+    width:13%;
+    height:50%;
+    background-color: #323079;
+    border:1px solid #323079;
+    border-radius: 30px;
+    color:white;
+}
+input#sendButton:focus{
+    outline:none;
+}
+
+ /* 메세지들은 리스트 형태로 출력됨 */
+li{
+    display:flex;
+    align-items: flex-end;
+    margin:10px;
+}
+li a{
+    width:70px;
+    height:70px;
+    position:relative;
+    border:1px solid black;
+    border-radius: 35px;
+}
+li img{
+    width:100%;
+    height:100%;
+
+}
+li .messages{
+    padding:0px 10px;
+}
+li time{
+    font-size:0.7em;
+    text-overflow: ellipsis;
 }
 
 .self{
+    flex-flow:row-reverse;
     text-align: end;
+}
+#messageContent{
+    border-radius: 10px;
+}
+
+.self #messageContent{
+    background-color: #FF8BA7;
+    border-bottom-right-radius: 0px;
+}
+
+.other #messageContent{
+    background-color: #817FAE;
+    border-bottom-left-radius: 0px;
 }

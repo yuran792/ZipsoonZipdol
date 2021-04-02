@@ -22,7 +22,6 @@
                 <% if(user){ %>
                     <div id="myinfo"><span id="myname"><%= user.name %></span><span id="myemail"><%= user.email %></span></div>
                 <% } %>
-                <button onclick="getUserlist();">조회하기</button>
             </div>
             <div id="current">
                 <div id="currentPartner">
@@ -32,9 +31,11 @@
                 </div>
                 <div id="currentConversation">
                     <ol id="messageBox">
+                        <div id="messageInfo">
                             <p><%= user.name %>님! 상대방과의 대화를 시작해보세요!</p>
                             <p>상대방의 페이지에 들어가 쪽지보내기를 누르면 대화를 시작할 수 있어요!</p>
-
+                        </div>
+    
                     </ol>
                     <div id="sendBox">
                         <input type="text" id="dataBox" placeholder="메시지를 입력하세요">
@@ -53,7 +54,8 @@
             var socket;
 
             function dateFormat(date){
-                
+                var str=date.getFullYear()+'년 '+date.getMonth()+'월 '+date.getDate()+'일 '+date.getHours()+'시 '+date.getMinutes()+'분';
+                return str;
             }
             $(document).ready(function(){ //쪽지함 들어오는 순간 소켓 연결
                 myname=document.getElementById('myname').innerText;
@@ -107,18 +109,19 @@
             
             function send(){
                 var message=$('#dataBox').val();
-                console.log('send()');
+                if(message.length==0){
+                    return;
+                }
                 
                 var receiver=$('#currentUserEmail').text();
-                
-                var msg={sender:myemail,receiver:receiver,type:'text',date:Date.now(),content:message};
+                var msg={sender:myemail,receiver:receiver,type:'text',date:dateFormat(new Date()),content:message};
                 if(socket==undefined){
                     alert('서버에 연결되어 있지 않습니다.');
                     return;
                 }
                 socket.emit('message',msg);
                 addToMessageBox('self',msg);
-                $('#dataBox').val()='';
+                $('#dataBox').val()=null;
                 
                 /*
                 //암호화 테스트
@@ -155,14 +158,23 @@
                 println('['+method+'] method로 요청을 보냈습니다.');
                 */
             };
+
             function addToMessageBox(writer,msg){
-                var contents="<li class='"+writer+"'>"
-                            +" <div class='profileimg'>"
+                console.log(typeof(msg.date));
+                var contents="<li class='"+writer+"'>";
+                if($('#messageBox').children().last().attr('class')==writer){
+                    contents+=" <a href='/profile' class='profileimg' style='visibility:hidden'>"
                             +"      <img src='../public/img/logo.png'>"
-                            +" </div>"
-                            +" <div class='messages'>"
-                            +"      <p>"+msg.content+"</p>"
-                            +"      <time datetime='"+msg.date+"'>"+msg.date+"</time>"
+                            +" </a>";
+                }
+                else{
+                    contents+=" <a href='/profile' class='profileimg'>"
+                            +"      <img src='../public/img/logo.png'>"
+                            +" </a>";
+                }
+                contents+=" <div class='messages'>"
+                            +"      <div id='messageContent'>"+msg.content+"</div>"
+                            +"      <time datetime=' YYYY-MM-DDThh:mm:ssTZD'>"+msg.date+"</time>"
                             +" </div>"
                             +"</li>";
                 console.log('추가할 HTML'+contents);
@@ -214,7 +226,7 @@
                     if(data.id==1004){ //대화상대 리스트 출력 요청 정상 응답 시
                         data.result.forEach(function(item,index){
                         var user='<div class="user" onclick="getMessage();">'+
-                        '<a href="/profile"><img></a>'+
+                        '<a href="/profile"><img src="../public/img/logo.png"></a>'+
                             '<p class="userName">'+item.name+'</p>'
                         +'<p class="userId">'+item.email+'</p>'
                             +'</div>';

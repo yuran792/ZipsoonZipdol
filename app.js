@@ -172,6 +172,7 @@ io.sockets.on('connection',function(socket){
                 var chatid= database.UserMessageModel.findByChatid(message.sender,message.receiver,function(err,result){
                     if(err) throw err;
                     
+                    console.log('메시지 '+message.date);
                     var newmessage={sender:message.sender,receiver:message.receiver,date:message.date,content:message.content};
                     if(result.length!=0){ //대화내역이 있다면    
                         result[0].addMessage(newmessage,function(err){
